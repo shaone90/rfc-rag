@@ -1,0 +1,10 @@
+# окружение
+.venv/
+__pycache__/
+
+# скачивается download_corpus.py
+corpus/
+
+# считается index.py, 16 МБ + 5 МБ
+index_vectors.npy
+index_chunks.json
