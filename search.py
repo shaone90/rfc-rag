@@ -1,4 +1,4 @@
-"""
+r"""
 Консольный поиск по индексу. Вводишь вопрос — получаешь 5 самых близких кусков
 с указанием, из какого RFC они взяты.
 
@@ -16,8 +16,8 @@ import sys
 import numpy as np
 import requests
 
-LMS_URL = "http://localhost:1234/v1"
-EMBED_MODEL = "text-embedding-bge-m3"   # то же имя, что в index.py
+LMS_URL = os.environ.get("LMS_URL", "http://localhost:1234/v1")
+EMBED_MODEL = os.environ.get("EMBED_MODEL", "text-embedding-bge-m3")   # то же, что в index.py
 TOP_K = 5
 PREVIEW = 600   # сколько символов куска показывать
 

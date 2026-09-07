@@ -1,4 +1,4 @@
-"""
+r"""
 Читает corpus/*.txt, режет на куски, считает эмбеддинги через LM Studio
 и складывает результат в два файла: index_vectors.npy и index_chunks.json.
 
@@ -20,10 +20,10 @@ import requests
 
 # --- настройки ---------------------------------------------------------------
 
-LMS_URL = "http://localhost:1234/v1"
 # ВАЖНО: имя модели должно совпадать с тем, что отдаёт LM Studio.
 # Открой в браузере http://localhost:1234/v1/models и скопируй оттуда "id".
-EMBED_MODEL = "text-embedding-bge-m3"
+LMS_URL = os.environ.get("LMS_URL", "http://localhost:1234/v1")
+EMBED_MODEL = os.environ.get("EMBED_MODEL", "text-embedding-bge-m3")
 
 CHUNK_SIZE = 1500   # примерный размер куска в символах
 BATCH = 32          # сколько кусков отправляем в модель за раз

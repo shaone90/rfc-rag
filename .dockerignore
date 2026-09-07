@@ -1,0 +1,11 @@
+# Всё это не должно попадать в контекст сборки: часть просто лишний вес,
+# .env — с адресами и настройками, ему в образе не место.
+.git/
+.venv/
+__pycache__/
+corpus/
+screenshots/
+index_vectors.npy
+index_chunks.json
+.env
+*.md

@@ -6,6 +6,7 @@ r"""
 """
 
 import gradio as gr
+import requests
 
 import rag
 
@@ -27,8 +28,16 @@ def on_ask(question):
 
     try:
         text, hits, best = rag.answer(question, VECTORS, CHUNKS)
+    except requests.exceptions.ConnectionError:
+        # Сервис на VPS доступен всегда, а модели — только пока включена
+        # домашняя машина. Это штатная ситуация, а не сбой: показываем текстом,
+        # а не трейсбеком.
+        return ("Сервер инференса сейчас не отвечает: машина с моделями выключена. "
+                "Поиск по индексу при этом жив, вернись позже за ответом."), ""
+    except requests.exceptions.Timeout:
+        return "Модель не ответила за отведённое время. Попробуй повторить вопрос.", ""
     except Exception as e:
-        return f"Ошибка обращения к LM Studio: {e}", ""
+        return f"Ошибка обращения к серверу инференса: {e}", ""
 
     if not hits:
         return text, ""

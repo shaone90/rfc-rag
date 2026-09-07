@@ -12,16 +12,21 @@ import requests
 
 # --- настройки ---------------------------------------------------------------
 
-LMS_URL = "http://localhost:1234/v1"
-EMBED_MODEL = "text-embedding-bge-m3"
-CHAT_MODEL = "gemma-4-e4b-it-ultra-uncensored-heretic"     # <-- подставь свой id из /v1/models
+# Значения по умолчанию рассчитаны на локальный запуск: LM Studio на этой же
+# машине, индекс рядом со скриптами. В контейнере всё перекрывается через .env,
+# потому что там сервер инференса живёт на другом конце WireGuard-туннеля.
 
-TOP_K = 8           # сколько кусков отдаём модели
-MIN_SCORE = 0.55    # ниже этой близости считаем, что в корпусе ответа нет
-MAX_CHARS = 1500    # обрезка куска перед отправкой в модель
+LMS_URL = os.environ.get("LMS_URL", "http://localhost:1234/v1")
+EMBED_MODEL = os.environ.get("EMBED_MODEL", "text-embedding-bge-m3")
+CHAT_MODEL = os.environ.get("CHAT_MODEL", "google/gemma-4-12b")   # id из /v1/models
 
-VECTORS_PATH = "index_vectors.npy"
-CHUNKS_PATH = "index_chunks.json"
+TOP_K = int(os.environ.get("TOP_K", 8))                 # сколько кусков отдаём модели
+MIN_SCORE = float(os.environ.get("MIN_SCORE", 0.55))    # ниже — считаем, что ответа нет
+MAX_CHARS = 1500                                        # обрезка куска перед отправкой в модель
+
+INDEX_DIR = os.environ.get("INDEX_DIR", ".")            # в контейнере индекс монтируется в /data
+VECTORS_PATH = os.path.join(INDEX_DIR, "index_vectors.npy")
+CHUNKS_PATH = os.path.join(INDEX_DIR, "index_chunks.json")
 
 PROMPT_TEMPLATE = """Ты отвечаешь на вопросы строго по приведённым фрагментам документов.
 
@@ -47,7 +52,7 @@ SESSION = requests.Session()   # переиспользуем TCP-соедине
 def load_index():
     """Читает матрицу векторов и тексты кусков. Возвращает (vectors, chunks)."""
     if not os.path.exists(VECTORS_PATH):
-        print("Индекса нет. Сначала запусти index.py")
+        print(f"Индекса нет ({VECTORS_PATH}). Сначала запусти index.py")
         sys.exit(1)
 
     vectors = np.load(VECTORS_PATH)
